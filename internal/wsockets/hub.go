@@ -2,7 +2,7 @@ package wsockets
 
 import (
 	"encoding/json"
-	"github.com/zacbriggssagecom/huddle/server/sharedinternal/data"
+	"github.com/zacharyworks/huddle-shared/data"
 	"log"
 	// "io/ioutil"
 	// "net/http"

@@ -1,13 +1,32 @@
 package wsockets
 
 import (
+	"../auth"
+	"../data-layer"
 	"encoding/json"
-	"github.com/zacbriggssagecom/huddle/server/gateway/internal/auth"
-	"github.com/zacbriggssagecom/huddle/server/sharedinternal/data"
-	"io/ioutil"
+	"github.com/zacharyworks/huddle-shared/data"
 	"log"
-	"net/http"
 )
+
+func openBoard(actionPayload json.RawMessage, client *Client) {
+	var board types.Board
+	json.Unmarshal(actionPayload, &board)
+	// register client as being subscribed to this board
+	client.boardID = board.BoardID
+	todos := dataLayer.GetBoardTodos(board)
+
+	initBoardAction, err := newAction("Session", "Board", board).build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	client.send <- initBoardAction
+
+	initBoardTodoAction, err := newAction("Todo", "Init", todos).build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	client.send <- initBoardTodoAction
+}
 
 func requestSession(client *Client) {
 	var err error
@@ -40,37 +59,29 @@ func sessionExists(actionMap map[string]json.RawMessage, client *Client) {
 	client.SessionID = sessionID
 
 	// Lookup the session in the DB
-	session := auth.RetreiveSessionByID(sessionID)
+	session := dataLayer.RetrieveSession(sessionID)
 	if session.UserFK != "" {
-		// A user was found
+		// A user was found!!
 		sessionJSON, err := json.Marshal(session)
+		client.authorised = true
 		if err != nil {
 			panic(err)
 		}
 		client.send <- sessionJSON
 	} else {
 		// No user was found
-		println("not authenticated")
 		return
 	}
 
-	// Send todos to the user
-	payload, err := http.Get("http://localhost:8081/todos")
-	var actionPayload []types.Todo
-	body, err := ioutil.ReadAll(payload.Body)
-	if err != nil {
-		log.Print(err)
-	}
-	json.Unmarshal(body, &actionPayload)
+	// Get the users information
+	user := dataLayer.GetUser(session.UserFK)
 
-	action, err := json.Marshal(types.TodoAction{
-		ActionSubset:  "Todo",
-		ActionType:    "Init",
-		ActionPayload: actionPayload,
-	})
-	if err != nil {
-		log.Print(err)
-	}
+	// Retrieve the boards the user is a member of
+	boards := dataLayer.GetUserBoards(user.OauthID)
 
-	client.send <- action
+	userAction, err := newAction("Session", "User", user).build()
+	client.send <- userAction
+
+	boardAction, err := newAction("Board", "Init", boards).build()
+	client.send <- boardAction
 }

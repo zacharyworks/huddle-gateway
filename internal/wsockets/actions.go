@@ -3,7 +3,6 @@ package wsockets
 import (
 	"encoding/json"
 	"log"
-	"net/http"
 	"strconv"
 )
 
@@ -17,9 +16,6 @@ func newActionHandler(h *Hub) *actionHandler {
 		hub: h}
 }
 
-var serverURL = "http://localhost:8081"
-var httpClient = &http.Client{}
-
 func (ah actionHandler) handle(message []byte, client *Client) {
 	// Transform message into a map
 	var actionMap map[string]json.RawMessage
@@ -28,28 +24,29 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 		log.Fatal(err)
 	}
 
-	actionType, err := strconv.Unquote(string(actionMap["ActionType"]))
 	actionSubset, err := strconv.Unquote(string(actionMap["ActionSubset"]))
+	actionType, err := strconv.Unquote(string(actionMap["ActionType"]))
+	actionPayload := actionMap["ActionPayload"]
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Convert todo from JSON into an structure
-	var todo Todo
 	switch actionSubset {
 	case "Todo":
+		var todo Todo
 		err := json.Unmarshal(actionMap["ActionPayload"], &todo)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		switch actionType {
-		case "Update":
-			todo.update(actionMap, message, ah)
 		case "Create":
-			todo.create(actionMap, message, ah)
+			todo.create(ah)
+		case "Update":
+			todo.update(message, ah)
 		case "Delete":
-			todo.delete(actionMap, message, ah)
+			todo.delete(message, ah)
 		}
 
 	case "Session":
@@ -58,6 +55,8 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 			requestSession(client)
 		case "Exists":
 			sessionExists(actionMap, client)
+		case "OpenBoard":
+			openBoard(actionPayload, client)
 		}
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 
 	"github.com/gorilla/websocket"
-	"github.com/zacbriggssagecom/huddle/server/sharedinternal/data"
+	"github.com/zacharyworks/huddle-shared/data"
 	"log"
 	"net/http"
 	"time"
@@ -42,7 +42,7 @@ type Client struct {
 	RandomState string
 	SessionID   string
 	authorised  bool
-	boardID     string
+	boardID     int
 	// Buffered channel for outbound messages
 	send chan []byte
 }

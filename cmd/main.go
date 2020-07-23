@@ -1,11 +1,11 @@
 package main
 
 import (
+	"../internal/auth"
+	"../internal/wsockets"
 	"encoding/json"
 	"flag"
-	"github.com/zacbriggssagecom/huddle/server/gateway/internal/auth"
-	"github.com/zacbriggssagecom/huddle/server/gateway/internal/wsockets"
-	"github.com/zacbriggssagecom/huddle/server/sharedinternal/db"
+	"github.com/zacharyworks/huddle-shared/db"
 	"io/ioutil"
 	"log"
 	"net/http"

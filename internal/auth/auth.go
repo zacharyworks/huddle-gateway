@@ -1,9 +1,10 @@
 package auth
 
 import (
+	"../data-layer"
 	"encoding/json"
 	"fmt"
-	"github.com/zacbriggssagecom/huddle/server/sharedinternal/data"
+	types "github.com/zacharyworks/huddle-shared/data"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
@@ -21,8 +22,9 @@ func NewAuth(clientID string, clientSecret string) *Authoriser {
 		RedirectURL:  "http://localhost:8080/callback",
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
-		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
-		Endpoint:     google.Endpoint}
+		Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile"},
+		Endpoint: google.Endpoint}
 	authoriser := Authoriser{config: conf}
 
 	return &authoriser
@@ -38,7 +40,7 @@ func (a *Authoriser) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SaveNewSession(session, state)
+	dataLayer.SaveNewSession(session, state)
 
 	// Redirect to be authorised
 	url := a.config.AuthCodeURL(state)
@@ -49,7 +51,8 @@ func (a *Authoriser) HandleLogin(w http.ResponseWriter, r *http.Request) {
 func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	// Attempt to find an existing session for the state
 	providedState := r.FormValue("state")
-	session, err := RetreiveSessionByState(providedState)
+	session, err := dataLayer.RetrieveSessionByState(providedState)
+	println(session.State)
 	if err != nil {
 		fmt.Printf("Error finding session for state: %s\n", err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -81,12 +84,14 @@ func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// does the user exist?
-	userOauthId := getUser(response.Id)
-	if userOauthId == "" {
+	userOauthID := dataLayer.GetUser(response.ID).OauthID
+	if userOauthID == "" {
 		postOauthUser(response)
+		// now it's been posted, go get it again
+		userOauthID = dataLayer.GetUser(response.ID).OauthID
 	}
-	userOauthId = getUser(response.Id)
-	updateSession(session, userOauthId)
+
+	dataLayer.UpdateSession(session, userOauthID)
 
 	// add user ID to session, as it's probably the user
 	if err != nil {
