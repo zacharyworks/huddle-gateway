@@ -21,6 +21,11 @@ func GetUser(ID string) types.User {
 	}
 
 	var user types.User
+	// no user was found
+	if response.StatusCode == http.StatusNotFound {
+		return user
+	}
+
 	processResponse(response, &user)
 
 	return user

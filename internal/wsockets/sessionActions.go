@@ -33,7 +33,7 @@ func requestSession(client *Client) {
 	// Get a session id to provide the
 	// user so they can hithertoforth assert
 	// who they are in our state.
-	client.SessionID, err = auth.GetRandomState()
+	client.SessionID, err = auth.GetRandomString(8)
 	if err != nil {
 		log.Fatal(err)
 	}

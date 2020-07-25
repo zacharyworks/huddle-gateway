@@ -34,7 +34,7 @@ func NewAuth(clientID string, clientSecret string) *Authoriser {
 func (a *Authoriser) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	// Retrieve session and generate random state
 	session := r.FormValue("session")
-	state, err := GetRandomState()
+	state, err := GetRandomString(8)
 	if err != nil {
 		fmt.Println("Error", err)
 		return

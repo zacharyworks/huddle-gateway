@@ -35,8 +35,7 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 	switch actionSubset {
 	case "Todo":
 		var todo Todo
-		err := json.Unmarshal(actionMap["ActionPayload"], &todo)
-		if err != nil {
+		if err := json.Unmarshal(actionMap["ActionPayload"], &todo); err != nil {
 			log.Fatal(err)
 		}
 
@@ -58,5 +57,22 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 		case "OpenBoard":
 			openBoard(actionPayload, client)
 		}
+
+	case "Board":
+		var board Board
+		if actionType != "NewBoard" && actionType != "JoinBoard" {
+			if err := json.Unmarshal(actionMap["ActionPayload"], &board); err != nil {
+				log.Fatal(err)
+			}
+		}
+		switch actionType {
+		case "JoinBoard":
+			joinBoard(actionPayload, client)
+		case "GetJoinCode":
+			board.newJoinCode(client)
+		case "NewBoard":
+			createBoard(actionPayload, client)
+		}
+
 	}
 }
