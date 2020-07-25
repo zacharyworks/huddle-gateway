@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"github.com/zacharyworks/huddle-shared/data"
 	"log"
-	// "io/ioutil"
-	// "net/http"
 )
 
 // Hub struct maintains the list of clients which are active

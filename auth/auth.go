@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"../data-layer"
 	"encoding/json"
 	"fmt"
+	dataLayer "github.com/zacharyworks/huddle-gateway/data-layer"
 	types "github.com/zacharyworks/huddle-shared/data"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"

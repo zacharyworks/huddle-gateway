@@ -1,9 +1,9 @@
 package wsockets
 
 import (
-	"../auth"
-	"../data-layer"
 	"encoding/json"
+	"github.com/zacharyworks/huddle-gateway/auth"
+	dataLayer "github.com/zacharyworks/huddle-gateway/data-layer"
 	"github.com/zacharyworks/huddle-shared/data"
 	"log"
 )

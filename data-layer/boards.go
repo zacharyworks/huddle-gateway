@@ -6,7 +6,6 @@ import (
 	types "github.com/zacharyworks/huddle-shared/data"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -16,7 +15,7 @@ func GetBoardTodos(board types.Board) []types.Todo {
 	var url strings.Builder
 	url.WriteString(restEndpoint)
 	url.WriteString("board/")
-	url.WriteString(strconv.Itoa(board.BoardID))
+	url.WriteString(board.BoardID)
 	url.WriteString("/todos")
 	println(url.String())
 	// make request

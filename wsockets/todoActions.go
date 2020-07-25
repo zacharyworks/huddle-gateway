@@ -1,7 +1,6 @@
 package wsockets
 
 import (
-	"../data-layer"
 	"encoding/json"
 	"github.com/zacharyworks/huddle-shared/data"
 	"log"
