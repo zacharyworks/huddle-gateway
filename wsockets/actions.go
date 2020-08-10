@@ -24,22 +24,21 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 		log.Fatal(err)
 	}
 
-	actionSubset, err := strconv.Unquote(string(actionMap["ActionSubset"]))
-	actionType, err := strconv.Unquote(string(actionMap["ActionType"]))
-	actionPayload := actionMap["ActionPayload"]
+	Subset, err := strconv.Unquote(string(actionMap["subset"]))
+	Type, err := strconv.Unquote(string(actionMap["type"]))
+	Payload := actionMap["payload"]
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	switch actionSubset {
+	switch Subset {
 	case "Todo":
 		var todo Todo
-		if err := json.Unmarshal(actionMap["ActionPayload"], &todo); err != nil {
+		if err := json.Unmarshal(actionMap["payload"], &todo); err != nil {
 			log.Fatal(err)
 		}
-
-		switch actionType {
+		switch Type {
 		case "Create":
 			todo.create(ah)
 		case "Update":
@@ -49,30 +48,30 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 		}
 
 	case "Session":
-		switch actionType {
+		switch Type {
 		case "RequestNew":
 			requestSession(client)
 		case "Exists":
 			sessionExists(actionMap, client)
 		case "OpenBoard":
-			openBoard(actionPayload, client)
+			openBoard(Payload, client, ah)
 		}
 
 	case "Board":
 		var board Board
-		if actionType != "NewBoard" && actionType != "JoinBoard" {
-			if err := json.Unmarshal(actionMap["ActionPayload"], &board); err != nil {
-				log.Fatal(err)
-			}
-		}
-		switch actionType {
-		case "JoinBoard":
-			joinBoard(actionPayload, client)
-		case "GetJoinCode":
-			board.newJoinCode(client)
-		case "NewBoard":
-			createBoard(actionPayload, client)
+		if err := json.Unmarshal(actionMap["payload"], &board); err != nil {
+			log.Fatal(err)
 		}
 
+		switch Type {
+		case "GetJoinCode":
+			board.newJoinCode(client)
+		case "Leave":
+			board.deleteMember(client)
+		case "BoardJoin":
+			joinBoard(Payload, client)
+		case "BoardNew":
+			createBoard(Payload, client)
+		}
 	}
 }

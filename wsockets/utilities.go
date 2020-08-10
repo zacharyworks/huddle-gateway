@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
+	"log"
 )
 
 type action struct {
@@ -13,11 +14,11 @@ type action struct {
 	Payload interface{}
 }
 
-func newAction(actionSubset string, actionType string, actionPayload interface{}) *action {
+func newAction(Subset string, Type string, Payload interface{}) *action {
 	return &action{
-		actionSubset,
-		actionType,
-		actionPayload,
+		Subset,
+		Type,
+		Payload,
 	}
 }
 
@@ -29,6 +30,14 @@ func (a action) build() ([]byte, error) {
 	})
 
 	return action, err
+}
+
+func (a action) send(w chan []byte) {
+	action, err := a.build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	w <- action
 }
 
 func GetRandomString() (string, error) {

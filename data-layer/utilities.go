@@ -9,7 +9,7 @@ import (
 )
 
 var httpClient = &http.Client{}
-var restEndpoint = "http://localhost:8081/"
+var restEndpoint = "http://localhost:8000/"
 
 func processResponse(response *http.Response, data interface{}) {
 	body, err := ioutil.ReadAll(response.Body)

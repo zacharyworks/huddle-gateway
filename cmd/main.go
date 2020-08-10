@@ -5,15 +5,21 @@ import (
 	"flag"
 	"github.com/zacharyworks/huddle-gateway/auth"
 	"github.com/zacharyworks/huddle-gateway/wsockets"
-	"github.com/zacharyworks/huddle-shared/db"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-var addr = flag.String("addr", ":8000", "http service address")
+type credentials struct {
+	ClientID     string
+	ClientSecret string
+	RestService  string
+}
+
+var addr = flag.String("addr", ":8080", "http service address")
 
 func main() {
+	credentials := readAuthCredentials()
 	flag.Parse()
 	// Create web socket service
 	hub := wsockets.NewHub()
@@ -24,27 +30,30 @@ func main() {
 	})
 
 	//Create auth service
-	oAuth := auth.NewAuth(readAuthCredentials())
+	oAuth := auth.NewAuth(credentials.ClientID, credentials.ClientSecret)
 	http.HandleFunc("/login", oAuth.HandleLogin)
 	http.HandleFunc("/callback", oAuth.HandleCallback)
 
 	// Start database
-	db.ConnectDB()
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Fatal("Listen and serve: ", err)
 	}
 }
 
-func readAuthCredentials() (clientID string, clientSecret string) {
+func readAuthCredentials() credentials {
 	file, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
 		log.Fatal(err)
 	}
-	credentials := make(map[string]string)
-	err = json.Unmarshal([]byte(file), &credentials)
+	credsmap := make(map[string]string)
+	err = json.Unmarshal([]byte(file), &credsmap)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return credentials["ClientID"], credentials["ClientSecret"]
+
+	return credentials{
+		ClientID:     credsmap["ClientID"],
+		ClientSecret: credsmap["ClientSecret"],
+		RestService:  credsmap["RestService"]}
 }

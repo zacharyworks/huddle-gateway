@@ -6,16 +6,16 @@ import (
 	types "github.com/zacharyworks/huddle-shared/data"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 func GetBoardTodos(board types.Board) []types.Todo {
-
 	// build URL
 	var url strings.Builder
 	url.WriteString(restEndpoint)
 	url.WriteString("board/")
-	url.WriteString(board.BoardID)
+	url.WriteString(strconv.Itoa(board.BoardID))
 	url.WriteString("/todos")
 	println(url.String())
 	// make request
@@ -46,7 +46,6 @@ func GetUserBoards(userID string) []types.Board {
 
 	var boards []types.Board
 	processResponse(response, &boards)
-
 	return boards
 }
 
@@ -110,4 +109,24 @@ func JoinBoard(boardJoin types.BoardJoin) (board types.Board) {
 
 	processResponse(response, &board)
 	return
+}
+
+func LeaveBoard(boardMember types.BoardMember) error {
+	// build URL
+	var url strings.Builder
+	url.WriteString(restEndpoint)
+	url.WriteString("board/member")
+
+	body, err := json.Marshal(boardMember)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Make the request
+	makeRequest(
+		http.MethodDelete,
+		url.String(),
+		bytes.NewBuffer(body))
+
+	return err
 }

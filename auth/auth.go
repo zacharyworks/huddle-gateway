@@ -89,6 +89,9 @@ func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		postOauthUser(response)
 		// now it's been posted, go get it again
 		userOauthID = dataLayer.GetUser(response.ID).OauthID
+	} else {
+		// update the user with any changes
+		putOauthUser(response)
 	}
 
 	dataLayer.UpdateSession(session, userOauthID)

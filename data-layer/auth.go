@@ -17,7 +17,7 @@ func UpdateSession(session types.Session, userFK string) {
 	session.UserFK = userFK
 	sessionJSON, err := json.Marshal(session)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// Build the request
@@ -40,6 +40,11 @@ func RetrieveSession(ID string) types.Session {
 	}
 
 	var session types.Session
+
+	if response.StatusCode == http.StatusNotFound {
+		return session
+	}
+
 	processResponse(response, &session)
 	return session
 }
