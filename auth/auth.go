@@ -19,7 +19,7 @@ type Authoriser struct {
 // NewAuth creates an oAuth provided the secrets
 func NewAuth(clientID string, clientSecret string) *Authoriser {
 	conf := &oauth2.Config{
-		RedirectURL:  "http://localhost:8080/callback",
+		RedirectURL:  "http://ec2-3-10-221-71.eu-west-2.compute.amazonaws.com:8080/callback",
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
