@@ -103,5 +103,5 @@ func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "http://localhost:3000", http.StatusPermanentRedirect)
+	http.Redirect(w, r, "http://ec2-3-10-221-71.eu-west-2.compute.amazonaws.com:3000", http.StatusPermanentRedirect)
 }
