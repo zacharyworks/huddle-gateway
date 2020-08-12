@@ -76,8 +76,11 @@ func (c *Client) readPump() {
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 
-		// handle contents of message
-		c.hub.actionHandler.handle(message, c)
+		if string(message) != "ping" {
+			// handle contents of message
+			c.hub.actionHandler.handle(message, c)
+		}
+
 	}
 }
 

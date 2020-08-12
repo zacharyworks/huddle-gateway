@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
-	"log"
 )
 
 type action struct {
@@ -30,14 +29,6 @@ func (a action) build() ([]byte, error) {
 	})
 
 	return action, err
-}
-
-func (a action) send(w chan []byte) {
-	action, err := a.build()
-	if err != nil {
-		log.Fatal(err)
-	}
-	w <- action
 }
 
 func GetRandomString() (string, error) {

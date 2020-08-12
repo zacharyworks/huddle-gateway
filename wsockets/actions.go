@@ -55,6 +55,8 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 			sessionExists(actionMap, client)
 		case "OpenBoard":
 			openBoard(Payload, client, ah)
+		case "Select":
+			selectTodo(actionMap, client, ah)
 		}
 
 	case "Board":

@@ -13,19 +13,20 @@ import (
 
 // Authoriser contains auth stuff
 type Authoriser struct {
-	config *oauth2.Config
+	config   *oauth2.Config
+	callback string
 }
 
 // NewAuth creates an oAuth provided the secrets
-func NewAuth(clientID string, clientSecret string) *Authoriser {
+func NewAuth(clientID string, clientSecret string, localService string) *Authoriser {
 	conf := &oauth2.Config{
-		RedirectURL:  "http://ec2-3-10-221-71.eu-west-2.compute.amazonaws.com:8080/callback",
+		RedirectURL:  localService + ":8080/callback",
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile"},
 		Endpoint: google.Endpoint}
-	authoriser := Authoriser{config: conf}
+	authoriser := Authoriser{config: conf, callback: localService}
 
 	return &authoriser
 }
@@ -52,7 +53,6 @@ func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	// Attempt to find an existing session for the state
 	providedState := r.FormValue("state")
 	session, err := dataLayer.RetrieveSessionByState(providedState)
-	println(session.State)
 	if err != nil {
 		fmt.Printf("Error finding session for state: %s\n", err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -103,5 +103,5 @@ func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "http://ec2-3-10-221-71.eu-west-2.compute.amazonaws.com:3000", http.StatusPermanentRedirect)
+	http.Redirect(w, r, a.callback+":3000", http.StatusPermanentRedirect)
 }

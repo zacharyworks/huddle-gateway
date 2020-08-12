@@ -1,6 +1,7 @@
 package wsockets
 
 import (
+	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
 	"log"
 )
@@ -22,23 +23,27 @@ func newSession(hub *Hub) *hubSession {
 }
 
 func (hs hubSession) clientLeft(client *Client) {
-	action := newAction("Todo", "PeerLeft", client.user)
+	action := types.Action{Subset: "Todo", Type: "PeerLeft", Payload: client.user}
 
 	for id, bMap := range hs.boardClientMap {
 		if bMap[client] == true {
-			hs.notifyBoard(id, *action)
+			hs.notifyBoard(id, action)
 			delete(bMap, client)
 		}
 	}
 }
 
-func (hs hubSession) notifyBoard(boardID int, action action) {
-	a, err := action.build()
+func (hs hubSession) notifyBoard(boardID int, a types.Action) {
+	action, err := json.Marshal(types.Action{
+		a.Subset,
+		a.Type,
+		a.Payload,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	for c := range hs.boardClientMap[boardID] {
-		c.send <- a
+		c.send <- action
 	}
 }
 
@@ -52,8 +57,8 @@ func (hs hubSession) addUserToBoard(boardID int, client *Client) {
 	hs.removeUserFromBoard(boardID, client)
 
 	// Add user to the new board
-	action := newAction("Todo", "Peer", client.user)
-	hs.notifyBoard(boardID, *action)
+	action := types.Action{Subset: "Todo", Type: "Peer", Payload: client.user}
+	hs.notifyBoard(boardID, action)
 
 	// Add the user to the board
 	hs.boardClientMap[boardID][client] = true
@@ -72,8 +77,8 @@ func (hs hubSession) removeUserFromBoard(boardId int, client *Client) {
 	}
 
 	// notify peers
-	action := newAction("Todo", "PeerLeft", client.user)
-	hs.notifyBoard(client.selectedBoardID, *action)
+	action := types.Action{Subset: "Todo", Type: "PeerLeft", Payload: client.user}
+	hs.notifyBoard(client.selectedBoardID, action)
 
 	client.selectedBoardID = 0
 	return

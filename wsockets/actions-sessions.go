@@ -33,6 +33,33 @@ func openBoard(Payload json.RawMessage, client *Client, ah actionHandler) {
 	ah.hub.hubSession.notifyClientOfPeers(client)
 }
 
+type selectedTodo struct {
+	TodoID int    `json:"todoID"`
+	UserID string `json:"userID"`
+}
+
+func selectTodo(actionMap map[string]json.RawMessage, client *Client, ah actionHandler) {
+	// Get the provided session ID
+	var todoID int
+	err := json.Unmarshal(actionMap["payload"], &todoID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	selectedTodo := selectedTodo{
+		TodoID: todoID,
+		UserID: client.user.OauthID,
+	}
+
+	action := types.Action{
+		Subset:  "Todo",
+		Type:    "PeerSelected",
+		Payload: selectedTodo,
+	}
+
+	ah.hub.hubSession.notifyBoard(client.selectedBoardID, action)
+}
+
 func requestSession(client *Client) {
 	var err error
 	// Get a session id to provide the

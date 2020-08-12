@@ -14,6 +14,7 @@ type credentials struct {
 	ClientID     string
 	ClientSecret string
 	RestService  string
+	LocalService string
 }
 
 var addr = flag.String("addr", ":8080", "http service address")
@@ -30,7 +31,7 @@ func main() {
 	})
 
 	//Create auth service
-	oAuth := auth.NewAuth(credentials.ClientID, credentials.ClientSecret)
+	oAuth := auth.NewAuth(credentials.ClientID, credentials.ClientSecret, credentials.LocalService)
 	http.HandleFunc("/login", oAuth.HandleLogin)
 	http.HandleFunc("/callback", oAuth.HandleCallback)
 
@@ -55,5 +56,6 @@ func readAuthCredentials() credentials {
 	return credentials{
 		ClientID:     credsmap["ClientID"],
 		ClientSecret: credsmap["ClientSecret"],
-		RestService:  credsmap["RestService"]}
+		RestService:  credsmap["RestService"],
+		LocalService: credsmap["Local"]}
 }
