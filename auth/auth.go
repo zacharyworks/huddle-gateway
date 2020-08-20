@@ -67,7 +67,7 @@ func (a *Authoriser) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// this is our token to access the user info from google, we've already authorised user at this point
-	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?max_auth_age=0&access_token=" + token.AccessToken)
 	if err != nil {
 		fmt.Printf("Could not get request %s\n", err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -19,7 +18,7 @@ func NewTodo(todo types.Todo) types.Todo {
 
 	body, err := json.Marshal(todo)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Make the request
@@ -42,7 +41,7 @@ func AllTodos() (todos []types.Todo) {
 	// Make the request
 	response, err := http.Get(url.String())
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	processResponse(response, &todos)
@@ -59,7 +58,7 @@ func UpdateTodo(todo types.Todo) {
 
 	body, err := json.Marshal(todo)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	makeRequest(
@@ -78,7 +77,7 @@ func DeleteTodo(todo types.Todo) {
 
 	body, err := json.Marshal(todo)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Make the request

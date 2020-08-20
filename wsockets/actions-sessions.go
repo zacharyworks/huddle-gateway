@@ -5,7 +5,6 @@ import (
 	"github.com/zacharyworks/huddle-gateway/auth"
 	dataLayer "github.com/zacharyworks/huddle-gateway/data-layer"
 	"github.com/zacharyworks/huddle-shared/data"
-	"log"
 )
 
 func openBoard(Payload json.RawMessage, client *Client, ah actionHandler) {
@@ -17,14 +16,14 @@ func openBoard(Payload json.RawMessage, client *Client, ah actionHandler) {
 
 	initBoardAction, err := newAction("Session", "Board", board).build()
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	client.send <- initBoardAction
 
 	initBoardTodoAction, err := newAction("Todo", "Init", todos).build()
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 	client.send <- initBoardTodoAction
 
@@ -43,13 +42,15 @@ func selectTodo(actionMap map[string]json.RawMessage, client *Client, ah actionH
 	var todoID int
 	err := json.Unmarshal(actionMap["payload"], &todoID)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	selectedTodo := selectedTodo{
 		TodoID: todoID,
 		UserID: client.user.OauthID,
 	}
+
+	client.selectedTodoID = todoID
 
 	action := types.Action{
 		Subset:  "Todo",
@@ -67,7 +68,7 @@ func requestSession(client *Client) {
 	// who they are in our state.
 	client.SessionID, err = auth.GetRandomString(8)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	action, err := json.Marshal(types.StringAction{
@@ -84,7 +85,7 @@ func sessionExists(actionMap map[string]json.RawMessage, client *Client) {
 	var sessionID string
 	err := json.Unmarshal(actionMap["payload"], &sessionID)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Update client to reflect provided session ID
@@ -97,7 +98,7 @@ func sessionExists(actionMap map[string]json.RawMessage, client *Client) {
 		sessionJSON, err := json.Marshal(session)
 		client.authorised = true
 		if err != nil {
-			log.Fatal(err)
+			println(err)
 		}
 		client.send <- sessionJSON
 	} else {

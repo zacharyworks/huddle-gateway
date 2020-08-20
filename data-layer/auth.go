@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -17,7 +16,7 @@ func UpdateSession(session types.Session, userFK string) {
 	session.UserFK = userFK
 	sessionJSON, err := json.Marshal(session)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Build the request
@@ -36,7 +35,7 @@ func RetrieveSession(ID string) types.Session {
 
 	response, err := http.Get(url.String())
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	var session types.Session
@@ -80,7 +79,7 @@ func SaveNewSession(sessionID string, randomState string) {
 
 	newSessionJSON, err := json.Marshal(newSession)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Build the request

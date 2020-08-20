@@ -3,7 +3,6 @@ package wsockets
 import (
 	"encoding/json"
 	"github.com/zacharyworks/huddle-shared/data"
-	"log"
 )
 
 // Hub struct maintains the list of clients which are active
@@ -52,7 +51,7 @@ func (h *Hub) Run() {
 				Payload: "",
 			})
 			if err != nil {
-				log.Fatal(err)
+				println(err)
 			}
 			client.send <- action
 

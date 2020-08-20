@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/zacharyworks/huddle-shared/data"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -23,7 +22,7 @@ func postOauthUser(oUser types.Response) {
 	}
 	newUserJSON, err := json.Marshal(newUser)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Build the url
@@ -36,13 +35,13 @@ func postOauthUser(oUser types.Response) {
 		http.MethodPost, postURL.String(), bytes.NewBuffer(newUserJSON))
 
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Execute the request, fetch response
 	_, err = httpClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 }
 
@@ -57,7 +56,7 @@ func putOauthUser(oUser types.Response) {
 	}
 	newUserJSON, err := json.Marshal(newUser)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Build the url
@@ -70,12 +69,12 @@ func putOauthUser(oUser types.Response) {
 		http.MethodPut, putURL.String(), bytes.NewBuffer(newUserJSON))
 
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Execute the request, fetch response
 	_, err = httpClient.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 }

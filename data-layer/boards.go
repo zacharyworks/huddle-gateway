@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,7 +20,7 @@ func GetBoardTodos(board types.Board) []types.Todo {
 	// make request
 	response, err := http.Get(url.String())
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	var todos []types.Todo
@@ -41,7 +40,7 @@ func GetUserBoards(userID string) []types.Board {
 	// make request
 	response, err := http.Get(url.String())
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	var boards []types.Board
@@ -57,7 +56,7 @@ func NewBoard(board types.NewBoard) types.Board {
 
 	body, err := json.Marshal(board)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Make the request
@@ -80,7 +79,7 @@ func NewBoardJoinCode(boardJoinCode types.BoardJoinCode) {
 
 	body, err := json.Marshal(boardJoinCode)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Make the request
@@ -98,7 +97,7 @@ func JoinBoard(boardJoin types.BoardJoin) (board types.Board) {
 
 	body, err := json.Marshal(boardJoin)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Make the request
@@ -119,7 +118,7 @@ func LeaveBoard(boardMember types.BoardMember) error {
 
 	body, err := json.Marshal(boardMember)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	// Make the request

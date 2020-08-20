@@ -14,7 +14,7 @@ type Board types.Board
 func (b Board) newJoinCode(client *Client) {
 	code, err := auth.GetRandomString(5)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 	newJoinCode := types.BoardJoinCode{
 		b.BoardID, code}
@@ -24,7 +24,7 @@ func (b Board) newJoinCode(client *Client) {
 	action, err := newAction("Board", "JoinCode", newJoinCode).build()
 
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	client.send <- action
@@ -37,7 +37,7 @@ func (b Board) deleteMember(client *Client) {
 	}
 	err := dataLayer.LeaveBoard(boardMember)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	action, err := json.Marshal(types.Action{
@@ -57,7 +57,7 @@ func (b Board) deleteMember(client *Client) {
 func joinBoard(Payload json.RawMessage, client *Client) {
 	var joinBoard types.BoardJoin
 	if err := json.Unmarshal(Payload, &joinBoard); err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	board := dataLayer.JoinBoard(joinBoard)
@@ -80,7 +80,7 @@ func joinBoard(Payload json.RawMessage, client *Client) {
 func createBoard(Payload json.RawMessage, client *Client) {
 	var newBoard types.NewBoard
 	if err := json.Unmarshal(Payload, &newBoard); err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	board := dataLayer.NewBoard(newBoard)

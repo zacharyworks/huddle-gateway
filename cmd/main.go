@@ -45,12 +45,12 @@ func main() {
 func readAuthCredentials() credentials {
 	file, err := ioutil.ReadFile("credentials.json")
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 	credsmap := make(map[string]string)
 	err = json.Unmarshal([]byte(file), &credsmap)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	return credentials{

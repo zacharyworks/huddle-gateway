@@ -2,7 +2,6 @@ package wsockets
 
 import (
 	"encoding/json"
-	"log"
 	"strconv"
 )
 
@@ -21,7 +20,7 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 	var actionMap map[string]json.RawMessage
 	err := json.Unmarshal(message, &actionMap)
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	Subset, err := strconv.Unquote(string(actionMap["subset"]))
@@ -29,14 +28,14 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 	Payload := actionMap["payload"]
 
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	switch Subset {
 	case "Todo":
 		var todo Todo
 		if err := json.Unmarshal(actionMap["payload"], &todo); err != nil {
-			log.Fatal(err)
+			println(err)
 		}
 		switch Type {
 		case "Create":
@@ -62,7 +61,7 @@ func (ah actionHandler) handle(message []byte, client *Client) {
 	case "Board":
 		var board Board
 		if err := json.Unmarshal(actionMap["payload"], &board); err != nil {
-			log.Fatal(err)
+			println(err)
 		}
 
 		switch Type {

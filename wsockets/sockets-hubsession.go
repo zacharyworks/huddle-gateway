@@ -3,7 +3,6 @@ package wsockets
 import (
 	"encoding/json"
 	types "github.com/zacharyworks/huddle-shared/data"
-	"log"
 )
 
 // hubSession keeps track of the current state
@@ -40,7 +39,7 @@ func (hs hubSession) notifyBoard(boardID int, a types.Action) {
 		a.Payload,
 	})
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 	for c := range hs.boardClientMap[boardID] {
 		c.send <- action
@@ -86,14 +85,33 @@ func (hs hubSession) removeUserFromBoard(boardId int, client *Client) {
 
 func (hs hubSession) notifyClientOfPeers(client *Client) {
 	var peers []types.User
+	var actions []types.Action
 	for client := range hs.boardClientMap[client.selectedBoardID] {
 		peers = append(peers, client.user)
+
+		selectedTodo := selectedTodo{
+			TodoID: client.selectedTodoID,
+			UserID: client.user.OauthID,
+		}
+		actions = append(actions, types.Action{
+			Subset:  "Todo",
+			Type:    "PeerSelected",
+			Payload: selectedTodo,
+		})
 	}
 
 	action, err := newAction("Todo", "Peers", peers).build()
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	client.send <- action
+	for _, action := range actions {
+		sendAction, err := json.Marshal(action)
+		if err != nil {
+			println(err)
+		}
+		println(string(sendAction))
+		client.send <- sendAction
+	}
 }

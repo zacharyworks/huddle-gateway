@@ -2,7 +2,6 @@ package dataLayer
 
 import (
 	types "github.com/zacharyworks/huddle-shared/data"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -17,7 +16,7 @@ func GetUser(ID string) types.User {
 	// make request
 	response, err := http.Get(url.String())
 	if err != nil {
-		log.Fatal(err)
+		println(err)
 	}
 
 	var user types.User
